@@ -6,49 +6,74 @@ JPEG input → decode → processing → encode JPEG output.
 
 ---------------------------------------------------------------------
 Features
+
 JPEG decoding/encoding using libjpeg
+
 Processing in YCbCr color space
+
 Dockerized execution environment
+
 CMake build support
+
 Unit test for core algorithm validation
 
 -------------------------------------------------------------------------
 
-Build Instructions
+Build and test Instructions
 
-Docker (I Recommend this)
+## I. Docker (I Recommend this)
 
 This project is fully containerized.
 
-Build
+##  Docker (Recommended)
+
+The recommended way to build and run the application is using Docker.
+
+### Build Image
+
+```bash
 docker build -t deinterlacer-app .
+```
 
-Run
+### Run Application
+
+```bash
 docker run -it -v ${PWD}:/app deinterlacer-app input.jpg output.jpg
+```
 
-These methods are optional and intended only for local development.: 
-Option 1 — CMake (Recommended for local builds)
+This will generate the processed output JPEG image.
+
+
+
+## II. Alternative Local Build Methods
+
+These build methods are optional and intended only for local development or debugging purposes.
+
+### Option 1 — CMake (Recommended for local builds)
+
+```bash
 mkdir build
 cd build
 cmake ..
 make -j$(nproc)
+```
 
-Option 2 — Manual g++ Build (Quick Testing)
+### Option 2 — Manual g++ Build
+
+```bash
 g++ -std=c++17 main.cpp deinterlacer.cpp jpeg_io.cpp -o app -ljpeg
+```
 
-
---------------------------------------------------------------------------------
-
-Run Instructions
-
-./app input.jpg output.jpg
 
 --------------------------------------------------------------------------------
 Sample Input / Output
 
 A sample image is provided to validate the implementation.
+
 ls sample/
+
 input.jpg  output.jpg  output.txt
+
 root@c66fa5bc29a3:/app#
 
 --------------------------------------------------------------------------------
