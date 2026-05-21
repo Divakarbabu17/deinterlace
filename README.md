@@ -2,9 +2,15 @@ Deinterlacer (JPEG YCbCr Processing Tool)
 
 This project is a command-line application that applies a simple deinterlacing (line blending) algorithm on JPEG images using the YCbCr color space.
 
-The goal of the implementation is to process images in a pipeline style:
 JPEG input → decode → processing → encode JPEG output.
 
+---------------------------------------------------------------------
+Features
+JPEG decoding/encoding using libjpeg
+Processing in YCbCr color space
+Dockerized execution environment
+CMake build support
+Unit test for core algorithm validation
 
 -------------------------------------------------------------------------
 
@@ -45,7 +51,10 @@ ls sample/
 input.jpg  output.jpg  output.txt
 root@c66fa5bc29a3:/app#
 
+--------------------------------------------------------------------------------
+Unit Tests
 
+A lightweight unit test validates the core  logic.
 
 
 

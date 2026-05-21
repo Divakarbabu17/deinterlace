@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-
+// Simple RAII wrapper to ensure FILE handles are always closed
 struct FileGuard {
     FILE* file;
 
@@ -26,6 +26,7 @@ struct FileGuard {
 
 namespace {
 
+// Basic validation to avoid processing corrupted or inconsistent image buffers
 void validateImageBuffer(const Image& image)
 {
     const size_t expected =
@@ -44,8 +45,9 @@ void validateImageBuffer(const Image& image)
     }
 }
 
-}
+} // namespace
 
+// Decode JPEG file into internal YCbCr-based Image structure
 Image loadJPEG(const std::string& path)
 {
     FileGuard file(fopen(path.c_str(), "rb"));
@@ -64,6 +66,7 @@ Image loadJPEG(const std::string& path)
 
     jpeg_read_header(&cinfo, TRUE);
 
+    // Force libjpeg to output in YCbCr format for consistent processing
     cinfo.out_color_space = JCS_YCbCr;
 
     jpeg_start_decompress(&cinfo);
@@ -86,6 +89,7 @@ Image loadJPEG(const std::string& path)
     image.cb.resize(pixelCount);
     image.cr.resize(pixelCount);
 
+    // Temporary buffer for one scanline from libjpeg
     const int rowStride =
         image.width * cinfo.output_components;
 
@@ -117,11 +121,12 @@ Image loadJPEG(const std::string& path)
     return image;
 }
 
-
+// Encode internal Image structure back into JPEG format
 bool saveJPEG(const std::string& path,
               const Image& image)
 {
     try {
+        // Ensure input buffers are valid before encoding
         validateImageBuffer(image);
 
         FileGuard file(fopen(path.c_str(), "wb"));

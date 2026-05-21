@@ -4,7 +4,7 @@
 #include "deinterlacer.hpp"
 #include "jpeg_io.hpp"
 
-
+// Simple helper to dump one Y/Cb/Cr channel into a text file
 void writeChannel(std::ofstream& out,
                   const std::vector<uint8_t>& ch,
                   int w,
@@ -21,6 +21,7 @@ void writeChannel(std::ofstream& out,
     }
 }
 
+// Writes full image (Y, Cb, Cr) to debug file for verification
 void writeImage(std::ofstream& out,
                 const Image& img,
                 const std::string& title)
@@ -34,7 +35,6 @@ void writeImage(std::ofstream& out,
     writeChannel(out, img.cr, img.width, img.height, "Cr");
 }
 
-
 class App
 {
 public:
@@ -44,10 +44,12 @@ public:
 
     void run()
     {
+        // Load JPEG and convert into internal YCbCr image format
         Image input = loadJPEG(inputPath);
 
         validate(input);
 
+        // Debug dump to inspect input/output channels (development aid)
         std::ofstream debugFile("output.txt");
         if (!debugFile.is_open()) {
             throw std::runtime_error("Cannot create debug file");
@@ -55,6 +57,7 @@ public:
 
         writeImage(debugFile, input, "INPUT IMAGE");
 
+        // Core processing step: deinterlacing via line blending
         Deinterlacer deinterlacer;
         Image output = deinterlacer.process(input);
 
@@ -62,6 +65,7 @@ public:
 
         debugFile.close();
 
+        // Encode processed image back to JPEG
         if (!saveJPEG(outputPath, output)) {
             throw std::runtime_error("Failed to save output JPEG");
         }
@@ -71,6 +75,7 @@ private:
     std::string inputPath;
     std::string outputPath;
 
+    // Basic sanity checks before processing
     void validate(const Image& img)
     {
         if (img.width <= 0 ||
@@ -82,9 +87,9 @@ private:
     }
 };
 
-
 int main(int argc, char** argv)
 {
+    // Ensure correct CLI usage
     if (argc != 3) {
         std::cerr << "Usage: ./app input.jpg output.jpg\n";
         return 1;
