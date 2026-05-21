@@ -6,7 +6,7 @@
 
 Image loadJPEG(const std::string& path);
 
-void saveJPEG(const std::string& path,
+bool saveJPEG(const std::string& path,
               const Image& image);
 
 #endif

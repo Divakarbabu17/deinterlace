@@ -10,8 +10,26 @@ JPEG input → decode → processing → encode JPEG output.
 
 Build Instructions
 
-Build the project using g++ with libjpeg:
+Docker (I Recommend this)
+
+This project is fully containerized.
+
+Build
+docker build -t deinterlacer-app .
+
+Run
+docker run -it -v ${PWD}:/app deinterlacer-app input.jpg output.jpg
+
+These methods are optional and intended only for local development.: 
+Option 1 — CMake (Recommended for local builds)
+mkdir build
+cd build
+cmake ..
+make -j$(nproc)
+
+Option 2 — Manual g++ Build (Quick Testing)
 g++ -std=c++17 main.cpp deinterlacer.cpp jpeg_io.cpp -o app -ljpeg
+
 
 --------------------------------------------------------------------------------
 

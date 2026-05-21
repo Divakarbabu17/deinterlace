@@ -4,6 +4,7 @@
 #include "deinterlacer.hpp"
 #include "jpeg_io.hpp"
 
+
 void writeChannel(std::ofstream& out,
                   const std::vector<uint8_t>& ch,
                   int w,
@@ -33,6 +34,55 @@ void writeImage(std::ofstream& out,
     writeChannel(out, img.cr, img.width, img.height, "Cr");
 }
 
+
+class App
+{
+public:
+    App(std::string input, std::string output)
+        : inputPath(std::move(input)),
+          outputPath(std::move(output)) {}
+
+    void run()
+    {
+        Image input = loadJPEG(inputPath);
+
+        validate(input);
+
+        std::ofstream debugFile("output.txt");
+        if (!debugFile.is_open()) {
+            throw std::runtime_error("Cannot create debug file");
+        }
+
+        writeImage(debugFile, input, "INPUT IMAGE");
+
+        Deinterlacer deinterlacer;
+        Image output = deinterlacer.process(input);
+
+        writeImage(debugFile, output, "OUTPUT IMAGE");
+
+        debugFile.close();
+
+        if (!saveJPEG(outputPath, output)) {
+            throw std::runtime_error("Failed to save output JPEG");
+        }
+    }
+
+private:
+    std::string inputPath;
+    std::string outputPath;
+
+    void validate(const Image& img)
+    {
+        if (img.width <= 0 ||
+            img.height <= 0 ||
+            img.y.empty())
+        {
+            throw std::runtime_error("Invalid image loaded");
+        }
+    }
+};
+
+
 int main(int argc, char** argv)
 {
     if (argc != 3) {
@@ -40,42 +90,14 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    const std::string inputPath  = argv[1];
-    const std::string outputPath = argv[2];
-
     try {
+        App app(argv[1], argv[2]);
+        app.run();
 
-        // Load JPEG
-        Image img = loadJPEG(inputPath);
-
-        std::ofstream debugFile("output.txt");
-
-        writeImage(debugFile,
-                   img,
-                   "INPUT IMAGE");
-
-        // Process image
-        Deinterlacer d;
-
-        Image out = d.process(img);
-
-        writeImage(debugFile,
-                   out,
-                   "OUTPUT IMAGE");
-
-        debugFile.close();
-
-        // Save processed JPEG
-        saveJPEG(outputPath, out);
-
-        std::cout << "Deinterlacing completed successfully.\n";
+        std::cout << "[INFO] Processing completed successfully\n";
     }
     catch (const std::exception& ex) {
-
-        std::cerr << "Error: "
-                  << ex.what()
-                  << "\n";
-
+        std::cerr << "[ERROR] " << ex.what() << "\n";
         return 1;
     }
 
